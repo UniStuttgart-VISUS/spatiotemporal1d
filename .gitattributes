@@ -1,0 +1,4 @@
+data.json       binary
+data/*.csv      binary
+data/*.json     binary
+dist/**/*.json  binary

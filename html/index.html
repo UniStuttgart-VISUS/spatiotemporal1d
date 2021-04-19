@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visual Analysis of Spatio-temporal Phenomena with 1D Projections</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABLUlEQVRYw+2Xv0oDQRDGf3uEJI3GQnwDi1TpLGzsfQBbm5DXCHkBnyBNwGewSHrBWp8grSAKRr0UNxauYSHuzt7l5BT2g4O5m5udb/7ssAsJDcO4LwISaWR++n6PyJGV28C7lQsgs/IKOMZs7LPSlMd+VfcrCAr7xKAVE9kmQ+Nwhl6BN2DgRKghq7umRcn/W3U6/6hgUyuBbtMEHpsmcLArAblT5sBNeLFnYAlcI/LdDx0gdxp0NAMufXOgr9A9D6uXtg8OHYe5ox/NYkrQB7OPqVKCobr/RX59DpRFIpAIlBpEPUFeGEYcGKb+3XCiZOBhTyHBVPF+QazzrQxoztUIZR6epE+pCROB/zIHrsR/LpjErCq5x34Nt+1wBhbVrwUWZ2H16TpdB/8WPgEugTyiItPFVgAAAABJRU5ErkJggg==" type="image/png">
+</head>
+<body>
+  <main>
+    <section class="intro">
+      <h1>Visual Analysis of Spatio-temporal Phenomena with 1D Projections</h1>
+
+      <p>
+        This is a live version of the prototype produced for the publication <q>Visual Analysis of Spatio-temporal Phenomena with 1D Projections</q> by Max Franke, Henry Martin, Steffen Koch, and Kuno Kurzhals;
+        submitted to and presented at EuroVis 2021 held virtually in Zurich, Switzerland, on June 14&ndash;18, 2021.
+        The code for this prototype is available under the <code>Apache-2.0</code> license on <a href="https://github.com/UniStuttgart-VISUS/spatiotemporal1d">GitHub</a>.
+      </p>
+
+      <p>
+        The COVID-19 data was obtained from <a href="https://covidatlas.com/">Covidatlas</a> and is in the public domain.
+        The Australian wildfire data was obtained from MODIS Collection 6 NRT Hotspot / Active Fire Detections MCD14DL distributed from NASA FIRMS (DOI: <a href="https://doi.org/10.5067/FIRMS/MODIS/MCD14DL.NRT.006">10.5067/firms/modis/mcd14dl.nrt.006</a>)
+      </p>
+    </section>
+    <section class="cards">
+      <a class="card-link card" href="vis.html?vis=corona">
+        <h2 class="card__title">COVID-19 Cases</h2>
+        <img class="card__img" src="corona.png" alt="corona visualization screenshot">
+        <span class="card__description">
+          <p>
+          The first dataset is a timeseries of confirmed COVID-19 cases.
+          The data is hierarchically aggregated based on geopolitical entities:
+          countries, states or provinces, counties, and on the lowest level cities.
+          </p>
+          <p>
+          The data originates from multiple sources, which have been aggregated by
+          <code>https://covidatlas.com/</code>.
+          </p>
+        </span>
+      </a>
+      <a class="card-link card" href="vis.html?vis=wildfire">
+        <h2 class="card__title">Australian Wildfires</h2>
+        <img class="card__img" src="wildfire.png" alt="wildfire visualization screenshot">
+        <span class="card__description">
+          <p>
+          Satellite imagery measured Fire Radiative Power (FRP) over Australia, indicating wildfires.
+          These are visualized on a map and in a 1D sequence over time.
+          The data is hierarchized based on grid squares.
+          </p>
+        </span>
+      </a>
+    </section>
+  </main>
+  <footer>
+    &copy; 2020&ndash;2021 Max Franke and Henry Martin.
+    <a href="https://github.com/UniStuttgart-VISUS/spatiotemporal1d">GitHub</a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Visual Analysis of Spatio-temporal Phenomena with 1D Projections</title>
+
+    <link rel="stylesheet" href="vis.css">
+    <link rel="stylesheet" href="leaflet.css">
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABLUlEQVRYw+2Xv0oDQRDGf3uEJI3GQnwDi1TpLGzsfQBbm5DXCHkBnyBNwGewSHrBWp8grSAKRr0UNxauYSHuzt7l5BT2g4O5m5udb/7ssAsJDcO4LwISaWR++n6PyJGV28C7lQsgs/IKOMZs7LPSlMd+VfcrCAr7xKAVE9kmQ+Nwhl6BN2DgRKghq7umRcn/W3U6/6hgUyuBbtMEHpsmcLArAblT5sBNeLFnYAlcI/LdDx0gdxp0NAMufXOgr9A9D6uXtg8OHYe5ox/NYkrQB7OPqVKCobr/RX59DpRFIpAIlBpEPUFeGEYcGKb+3XCiZOBhTyHBVPF+QazzrQxoztUIZR6epE+pCROB/zIHrsR/LpjErCq5x34Nt+1wBhbVrwUWZ2H16TpdB/8WPgEugTyiItPFVgAAAABJRU5ErkJggg==" type="image/png">
+
+    <!-- https://stackoverflow.com/questions/32567156/why-dont-css-filters-work-on-svg-elements-in-chrome -->
+    <svg width="0px" height="0px" style="position: fixed;">
+      <defs>
+        <filter id="grayscale80">
+          <feColorMatrix type="saturate" values="0.2" />
+        </filter>
+      </defs>
+    </svg>
+  </head>
+  <body>
+    <div class="grid grid--fit">
+      <div class="content controls">
+        <div class="links">
+          <ul class="horizontal-list">
+            <li><a href="vis.html?vis=corona">COVID-19</a></li>
+            <li><a href="vis.html?vis=wildfire">Wildfire</a></li>
+          </ul>
+        </div>
+        <div class="curve-type-selector">
+          <h4>Curve Type</h4>
+          <div class="grid">
+            <div class="row curve-types__header">
+              <span class="title">Projection</span>
+              <span class="M1">M<sub>1</sub></span>
+              <span class="M2">M<sub>2</sub></span>
+              <span class="metric_stress">S<sub>m</sub></span>
+              <span class="nonmetric_stress">S<sub>nm</sub></span>
+            </div>
+          </div>
+        </div>
+        <div class="reorder-radius-selector">
+          <h4>Radius</h4>
+        </div>
+        <div class="minimap-zoom-control">
+          <h4>Minimap Zoom</h4>
+          <select id="zoom-type" name="zoom-type">
+            <option value="none">None</option>
+            <option value="parent">Parent</option>
+            <option value="root-parent">Root-parent</option>
+          </select>
+        </div>
+      </div>
+      <div class="content map-div" id="map-div">
+      </div>
+      <div class="content timeline-div">
+        <svg id="timeline">
+          <g class="tree"></g>
+          <g class="distances"></g>
+        </svg>
+      </div>
+    </div>
+    <script src="bundle.js"></script>
+  </body>
+</html>
