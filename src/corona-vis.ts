@@ -9,7 +9,7 @@ import { hsl } from 'd3-color';
 import { range, sum } from 'd3-array';
 import { json } from 'd3-fetch';
 import { interpolateYlOrBr } from 'd3-scale-chromatic';
-import { CircleMarker, LatLngExpression, LatLngLiteral, LeafletMouseEvent, circleMarker, map, Map as LeafletMap } from 'leaflet';
+import { CircleMarker, GeoJSON, LatLngExpression, LatLngLiteral, LeafletMouseEvent, circleMarker, geoJSON, map, Map as LeafletMap } from 'leaflet';
 
 import * as T from './types';
 import DataManager from './data-manager';
@@ -82,14 +82,18 @@ export default class Visualization {
       zoomSnap: 0.1
     }).setView([40, 0], 2);
 
+    const is_rki = (new URL(location.href).searchParams.get('vis') === 'corona_rki');
+    // hotfix to center map on Germany for that dataset
+    if (is_rki) lmap.fitBounds([[47.3, 5.9], [55, 15]]);
+
     const parse = timeParse(data.timeseries.format);
     const fmt = timeFormat(data.timeseries.format);
     const time_span: [Date, Date] = [data.timeseries.start, timeDay.offset(data.timeseries.end)];
 
     const day = timeFormat(data.timeseries.format)(data.timeseries.end);
 
-    const __steps = range(1, 7);
-    const thresholds = __steps.map(d => Math.pow(10, d-1));
+    const __steps = is_rki ? range(1, 10) : range(1, 7);
+    const thresholds = is_rki ? __steps.map(d => Math.pow(5, d-1)) : __steps.map(d => Math.pow(10, d-1));
     const radii = [0].concat(__steps.map(d => d*2+0.5));
     const colors_offset = scaleLinear()
       .domain([__steps[0], __steps[__steps.length - 1]])
@@ -438,7 +442,7 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
   private _show_active_cases: boolean = false;
 
   private _selected_ids: Set<string> = new Set<string>();
-  private _markers = new Map<string, [CircleMarker, T.Datum<number[]>]>();
+  private _markers = new Map<string, [CircleMarker | GeoJSON, T.Datum<number[]>]>();
 
   constructor(
     hc: DataManager<CoronaExtraInformation, CoronaTimelineDatum, CoronaMetadata>,
@@ -499,7 +503,11 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
 
     lod_data.forEach(datum => {
       if (!this._markers.has(datum.id)) {
-        const circle = circleMarker(datum, {
+        const circle = ('geojson' in datum)
+          ? geoJSON(datum.geojson)
+          : circleMarker(datum);
+
+        circle.setStyle({
           renderer,
           fill: true,
           fillOpacity: 1,
@@ -565,15 +573,22 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
       const fillOpacity = (datum !== null) ? 1 : 0.8;
       const weight = active ? 2 : 1;
 
-      circ.setRadius(radius);
-      circ.setStyle({fillColor, fillOpacity, weight});
+      if (circ instanceof CircleMarker) {
+        circ.setRadius(radius);
+        circ.setStyle({fillColor, fillOpacity, weight});
+      } else {
+        // XXX
+        circ.setStyle({fillColor, fillOpacity, weight});
+      }
     });
 
     // reorder by size
     const ms = [];
     this._markers.forEach(([m, _], id) => {
-      m.remove();
-      ms.push([m,id]);
+      if (m instanceof CircleMarker) {
+        m.remove();
+        ms.push([m,id]);
+      }
     });
     ms.sort((a,b) => ((+this._selected_ids.has(b[1])) - (+this._selected_ids.has(a[1]))) || (b[0].getRadius() - a[0].getRadius()));
     ms.forEach(m => m[0].addTo(this._marker_group));
@@ -582,6 +597,7 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
 
   protected createLegendContent(div: HTMLDivElement): void {
     const ref = this;
+    const is_rki = (new URL(location.href).searchParams.get('vis') === 'corona_rki');
 
     const radii = this._sizes.range();
     const thresholds = this._sizes.domain();
@@ -604,26 +620,36 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
       .style('border', '1px solid #444')
       .append('svg')
       .classed('legend', true)
-      .attr('width', 120)
-      .attr('height', 2 * sum(radii) + 12*(thresholds.length) + 2*12)
+      .attr('width', is_rki ? 100 : 120)
+      .attr('height', is_rki ? (15 * thresholds.length + 10) : (2 * sum(radii) + 12*(thresholds.length) + 2*12))
       .append('g')
-      .attr('transform', 'translate(20, 20)');
+      .attr('transform', is_rki ? 'translate(5, 5)' : 'translate(20, 20)');
+
     thresholds.forEach((thresh, i) => {
       const r = radii[i+1];
-      const delta = 2 * sum(radii.slice(0, i)) + 12*i;
+      const delta = is_rki ? 15 * i : 2 * sum(radii.slice(0, i)) + 12*i;
       [[0, true], [80, false]].forEach(([x, unbrushed]: [number, boolean]) => {
-        l.append('circle')
-          .attr('cx', x)
-          .attr('cy', delta+r)
-          .attr('r', r)
-          .attr('fill', (unbrushed ? ref._colors_muted : ref._colors)(thresh))
-          .attr('stroke', '#444')
-          .attr('stroke-width', 1);
+        if (is_rki) {
+          const pathdata = `m ${x} ${delta} l 12 0 0 12 -12 0 z`;
+          l.append('path')
+            .attr('fill', (unbrushed ? ref._colors_muted : ref._colors)(thresh))
+            .attr('d', pathdata)
+            .attr('stroke-width', 1)
+            .attr('stroke', '#444');
+        } else {
+          l.append('circle')
+            .attr('fill', (unbrushed ? ref._colors_muted : ref._colors)(thresh))
+            .attr('cx', x)
+            .attr('cy', delta+r)
+            .attr('r', r)
+            .attr('stroke-width', 1)
+            .attr('stroke', '#444');
+        }
       });
       l.append('text')
-        .html(`&ge;&thinsp;${format('.1s')(thresholds[i])}`)
+        .html(is_rki ? `&ge;&thinsp;${format('.2s')(thresholds[i])}` : `&ge;&thinsp;${format('.1s')(thresholds[i])}`)
         .attr('x', 20)
-        .attr('y', delta+r)
+        .attr('y', is_rki ? (delta + 6) : (delta + r))
         .attr('dy', 5)
         .attr('font-size', 12);
     });

@@ -11,6 +11,7 @@ const matches
   = [
   [/^corona$/i, CVis, 'corona.json'],
   [/^wildfire$/i, WVis, 'wildfire.json'],
+  [/^corona_rki/i, CVis, 'corona_rki.json'],
 ];
 
 function launch(vis: string | null) {

@@ -17,7 +17,9 @@ $ webpack
 ### Generating the Datasets
 
 The datasets for COVID-19 cases and Australian wildfires can be generated using the Python scripts in the `preprocessing` directory.
-For the COVID-19 data, the source dataset needs to be downloaded first.
+For the COVID-19 data, the source dataset needs to be downloaded first, which is handled by the `Makefile`.
+Sadly, the *Covidatlas* dataset is not updated or hosted anymore.
+We have added a second dataset which only covers the counties (*"Landkreise"*) of Germany and is provided by the RKI.
 More detailed instructions regarding dataset preprocessing can be found in `preprocessing/README.md`.
 The generated datasets should be placed in the same directory as the generated assets.
 

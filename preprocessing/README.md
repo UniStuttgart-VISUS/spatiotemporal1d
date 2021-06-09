@@ -34,6 +34,23 @@ python3 corona.py \
   ../dist/corona.json.br                # output file, is Brotli-compressed
 ```
 
+**NOTE:** As of June 2021, this dataset is no longer updated and the AWS bucket where a last snapshot is hosted ([link](https://liproduction-backupsbucket-1p1muatw3b1h1.s3-us-west-1.amazonaws.com/final-reports-2021-05-29.tgz)) seems to be private.
+For the time being, there is no way to get this data, and the version on the live site will therefore only show data up until April 18, 2021, as that was the most recent data I had downloaded.
+
+## RKI COVID-19 Dataset for Germany
+
+The COVID-19 dataset depends on two input files, both provided by the Robert Koch Institute (RKI) under the *data license Germany - attribution - version 2.0* (dl-de/by-2-0).
+The script `get.sh` in the directory `../data` will download the newest data from `arcgis.com` and deposit them in the `../data` directory.
+
+Within the `virtualenv`, the RKI COVID-19 dataset can be generated as follows:
+
+``` sh
+python3 corona_rki.py \
+  ../data/RKI_Corona_Landkreise.geojson \ # county data (GeoJSON)
+  ../data/RKI_History.csv  \              # CSV with day-by-day values for the counties
+  ../dist/corona_rki.json.br              # output file, is Brotli-compressed
+```
+
 ## Wildfire Dataset
 
 The wildfire dataset only depends on an input dataset, which is present in the `../data/wildfire-binned.json.br` file in Brotli-compressed form.

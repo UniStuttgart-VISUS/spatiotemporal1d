@@ -1,5 +1,6 @@
 /node_modules/
 /dist/
 /data/*.json
+/data/*.geojson
 /data/*.csv
 __pycache__/
