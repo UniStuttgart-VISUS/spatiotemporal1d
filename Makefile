@@ -1,4 +1,4 @@
-all: dist/corona.json.br dist/vis.css.br dist/wildfire.json.br
+all: dist/corona.json.br dist/vis.css.br dist/wildfire.json.br corona_rki.json.br
 
 data/corona-raw.json data/RKI_Corona_Landkreise.geojson data/RKI_History.csv:
 	(cd data; ./get.sh)
