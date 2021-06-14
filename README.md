@@ -34,6 +34,9 @@ If your server does not support this, extract the files before deploy.
 
 ## How to Cite
 
+**Note:** This content is bound to change after the EuroVis conference.
+At the moment, we do not have all the information (e.g., DOI, page numbers, ...).
+
 Franke et al. "Visual Analysis of Spatio-temporal Phenomena with 1D Projections," to appear in *Proceedings of EuroVis 2021.* The Eurographics Association, 6 2021.
 
 BibTeX entry:
