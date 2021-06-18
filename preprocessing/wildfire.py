@@ -25,6 +25,7 @@ from projections.morton import MortonProjection
 from projections.hierarchicalclustering import HierarchicalClusteringProjection
 from projections.dynamictimewarping import DynamicTimeWarpingProjection
 from projections.firstoccurrence import FirstOccurrenceProjection
+from projections.umap import UMAPProjection
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)8s  %(message)s',
@@ -259,6 +260,24 @@ def create_projections(data, flightdata=None, tslen=1):
         ''',
         dict(tslen=tslen, tsfunc=extract_timeseries)
         ))
+
+    projections.append((UMAPProjection,
+        F'umap_10_euclidean',
+        F'<span class="main">UMAP</span>',
+        F'''<h4>1D UMAP</h4>
+
+        <p>
+            Order subtrees by their projected position using 1D UMAP.
+            <code>n_neighbors</code> = 10, Euclidean distance metric.
+        </p>
+
+        <p>
+            [1] McInnes, L, Healy, J, <q>UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction,</q> ArXiv e-prints 1802.03426, 2018.
+        </p>
+        ''',
+        dict(n_neighbors=10, metric='euclidean')
+        ))
+
 
 
     args = zip(repeat(data), projections)
