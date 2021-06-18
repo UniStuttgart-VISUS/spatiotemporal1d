@@ -26,6 +26,7 @@ from projections.morton import MortonProjection
 from projections.hierarchicalclustering import HierarchicalClusteringProjection, HierarchicalClusteringFlightdataProjection
 from projections.dynamictimewarping import DynamicTimeWarpingProjection
 from projections.firstoccurrence import FirstOccurrenceProjection
+from projections.umap import UMAPProjection
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)8s  %(message)s',
@@ -194,82 +195,6 @@ def parse_location_data(ts, loc, data):
     return simplified_data
 
 
-def fix_missing(data, lut, missing):
-    logging.info('Fixing missing hierarchy parents.')
-    for m in missing:
-        import uuid
-
-        i = m.find(', ')
-        parent = m[i+2:]
-
-        children = list(filter(lambda d: lut[d['name']] == m, data))
-
-        conf = dict()
-
-        for child in children:
-            for k,v in child['data'].items():
-                if k in conf:
-                    conf[k] = conf[k] + v
-                else:
-                    conf[k] = v
-        data_ = conf
-
-        lts = list(filter(lambda d: d is not None, map(lambda d: d['lat'], children)))
-        lns = list(filter(lambda d: d is not None, map(lambda d: d['lng'], children)))
-        lat = None if len(lts) == 0 else sum(lts) / len(lts)
-        lng = None if len(lns) == 0 else sum(lns) / len(lns)
-
-        elem = Datum(name=m, data=data_, lat=lat, lng=lng, id=str(uuid.uuid1()))
-        data.append(elem)
-        lut[m] = parent
-
-        logging.info('  Adding hierarchy node for %s', m)
-
-
-def fix_lat_lng(data, f):
-    logging.info('Fixing coordinates.')
-    fixes = dict()
-    failed = False
-
-    c = csv.reader(f)
-    for line in c:
-        lat = float(line[1])
-        lng = float(line[2])
-        fixes[line[0]] = (lat, lng)
-
-    for d in data:
-        if (d.lat is None or d.lng is None) and d.name not in fixes:
-            logging.error('  Location %s has no valid coordinates!', d.name)
-            failed = True
-
-        if d.name in fixes:
-            lat, lng = fixes[d.name]
-            logging.info(F'  Fixing lat/lng for {d.name}: {d.lat}/{d.lng} -> {lat}/{lng}')
-            d.lat = lat
-            d.lng = lng
-
-    return failed
-
-
-def check_no_duplicate_coordinates(agg, root=True):
-    if root:
-        logging.info('Checking uniqueness of geographical locations.')
-
-    failed = False
-    for datum in agg:
-        same = list(map(lambda x: x.id, filter(lambda x: x is not datum and abs(x.lat-datum.lat) < 1e-6 and abs(x.lng-datum.lng) < 1e-6, agg)))
-        if len(same) > 0:
-            failed = True
-
-            logging.error('  Location %s shares the geographical locations of %s.', datum.id, ', '.join(same))
-
-        if datum.children is not None:
-            subfail = check_no_duplicate_coordinates(datum.children, False)
-            failed = failed or subfail
-
-    return failed
-
-
 def create_metadata():
     logging.info('Creating dataset metadata.')
     return dict(
@@ -379,7 +304,7 @@ def create_projections(data, flightdata=None, tslen=1):
         </p>
 
         <p>
-            [1] H. Sakoe, S. Chiba, “Dynamic programming algorithm optimization for spoken word recognition,” IEEE Transactions on Acoustics, Speech and Signal Processing, vol. 26(1), pp. 43–49, 1978.
+            [1] H. Sakoe, S. Chiba, <q>Dynamic programming algorithm optimization for spoken word recognition,</q> IEEE Transactions on Acoustics, Speech and Signal Processing, vol. 26(1), pp. 43–49, 1978.
         </p>
         ''',
         dict(
@@ -399,6 +324,23 @@ def create_projections(data, flightdata=None, tslen=1):
         </p>
         ''',
         dict(tslen=tslen, tsfunc=extract_timeseries)
+        ))
+
+    projections.append((UMAPProjection,
+        F'umap_10_euclidean',
+        F'<span class="main">UMAP</span>',
+        F'''<h4>1D UMAP</h4>
+
+        <p>
+            Order subtrees by their projected position using 1D UMAP.
+            <code>n_neighbors</code> = 10, Euclidean distance metric.
+        </p>
+
+        <p>
+            [1] McInnes, L, Healy, J, <q>UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction,</q> ArXiv e-prints 1802.03426, 2018.
+        </p>
+        ''',
+        dict(n_neighbors=10, metric='euclidean')
         ))
 
     args = zip(repeat(data), projections)
