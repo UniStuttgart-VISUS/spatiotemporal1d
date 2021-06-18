@@ -191,7 +191,10 @@ export default class DataManager<
     this._parent_name_stack = [];
 
     // set strategy
-    this._current_strategy = d.projections.map(d => d.key)[0];
+    const url_proj = new URL(window.location.href).searchParams.get('proj');
+    const proj_names = d.projections.map(d => d.key);
+    if (url_proj !== null && proj_names.includes(url_proj)) this._current_strategy = url_proj;
+    else this._current_strategy = proj_names[0];
 
     // set layouts
     this._reverse_order_luts = new Map<string, Map<string, number>>();

@@ -21,6 +21,7 @@ interface RadiusCallable {
 
   projections: Projection[];
   currentParentName(): string;
+  current_strategy: CurveIdentifier;
 
   toggleProjectionSortBy(key: string);
   compareProjections(a: Projection, b: Projection): number;
@@ -101,7 +102,7 @@ export class Controls {
           .on('change', () => {
             ref._hc.reorder(d.key);
           });
-        if (i === 0) input.node().checked = true;
+        if (d.key === ref._hc.current_strategy) input.node().checked = true;
         select(this)
           .append('label')
           .classed('title', true)
