@@ -621,7 +621,7 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
       .append('svg')
       .classed('legend', true)
       .attr('width', is_rki ? 100 : 120)
-      .attr('height', is_rki ? (15 * thresholds.length + 10) : (2 * sum(radii) + 12*(thresholds.length) + 2*12))
+      .attr('height', is_rki ? (15 * thresholds.length + 10 + 25) : (2 * sum(radii) + 12*(thresholds.length) + 2*12))
       .append('g')
       .attr('transform', is_rki ? 'translate(5, 5)' : 'translate(20, 20)');
 
@@ -654,24 +654,29 @@ class CoronaMapPane extends MapPane<DataManager<CoronaExtraInformation, CoronaTi
         .attr('font-size', 12);
     });
 
+    const l1y = is_rki ? 15 * thresholds.length + 10 : 12*(thresholds.length-1) + 2*sum(radii) - 8;
+    const l2y = is_rki ? 15 * thresholds.length + 24 : 12*(thresholds.length-1) + 2*sum(radii) + 6;
+    const lx = is_rki ? -3 : -10;
+    const lw = is_rki ? 16 : 20;
+
     l.append('path')
       .attr('stroke', 'green')
       .attr('stroke-width', 2)
-      .attr('d', `M -10 ${12*(thresholds.length-1) + 2*sum(radii) - 8} l 20 0`);
+      .attr('d', `M ${lx} ${l1y} h ${lw}`);
     l.append('path')
       .attr('stroke', 'grey')
       .attr('stroke-width', 2)
-      .attr('d', `M -10 ${12*(thresholds.length-1) + 2*sum(radii) + 6} l 20 0`);
+      .attr('d', `M ${lx} ${l2y} h ${lw}`);
     l.append('text')
         .html(`active / 1M`)
         .attr('x', 20)
-        .attr('y', 12*(thresholds.length-1) + 2*sum(radii) - 8)
+        .attr('y', l1y)
         .attr('dy', 5)
         .attr('font-size', 12);
     l.append('text')
         .html('cases / 1M')
         .attr('x', 20)
-        .attr('y', 12*(thresholds.length-1) + 2*sum(radii) + 6)
+        .attr('y', l2y)
         .attr('dy', 5)
         .attr('font-size', 12);
   }
