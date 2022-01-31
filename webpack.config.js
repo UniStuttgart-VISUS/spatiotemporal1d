@@ -9,7 +9,6 @@ module.exports = function(env, argv) {
     mode: argv.mode || 'development',
     entry: [
       `./src/entry.ts`,
-      `./src/style.scss`,
       `./html/index.html`,
       `./html/vis.html`,
     ],
@@ -19,29 +18,6 @@ module.exports = function(env, argv) {
         {
           test: /\.ts$/,
           use: 'ts-loader',
-        },
-        {
-          test: /\.scss$/,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: 'vis.css',
-              }
-            },
-            {
-              loader: 'extract-loader'
-            },
-            {
-              loader: 'css-loader'
-            },
-            {
-              loader: 'postcss-loader'
-            },
-            {
-              loader: 'sass-loader'
-            }
-          ]
         },
         {
           test: /\.template\.html$/,
