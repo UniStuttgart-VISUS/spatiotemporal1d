@@ -26,7 +26,7 @@ The generated datasets should be placed in the same directory as the generated a
 
 ### Compression
 
-By default, both the webpage assets and the datasets are compressed using Brotli compression.
+By default, both the datasets are compressed using Brotli compression.
 This greatly reduces file sizes on transmission, and most modern browsers support Brotli compression for HTTP traffic.
 However, the web server needs to support serving files pre-compressed.
 If your server does not support this, extract the files before deploy.

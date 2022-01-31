@@ -1,7 +1,5 @@
 const path = require('path');
 const terser = require('terser-webpack-plugin');
-const zlib = require("zlib");
-const CompressionPlugin = require("compression-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = function(env, argv) {
@@ -73,19 +71,6 @@ module.exports = function(env, argv) {
       }) ]
     },
     plugins: [
-      new CompressionPlugin({
-        filename: '[path][base].br',
-        test: /\.js$|\.css$|\.js\.LICENSE\.txt$|\.js\.map$|\.html$/,
-        algorithm: 'brotliCompress',
-        deleteOriginalAssets: true,
-        compressionOptions: {
-          params: {
-            [zlib.constants.BROTLI_PARAM_QUALITY]: (argv.mode === 'production')
-              ? zlib.constants.BROTLI_MAX_QUALITY
-              : zlib.constants.BROTLI_MIN_QUALITY,
-        }
-        },
-      }),
       new CopyPlugin({
         patterns: [
           {from: 'node_modules/leaflet/dist/leaflet.css', to: '.'},
