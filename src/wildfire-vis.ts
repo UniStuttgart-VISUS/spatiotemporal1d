@@ -1,5 +1,5 @@
 import { ScaleThreshold, ScaleTime, scaleLinear, scaleThreshold, scaleTime } from 'd3-scale';
-import { Selection, event, select, } from 'd3-selection';
+import { Selection, select, } from 'd3-selection';
 import { axisBottom, axisTop } from 'd3-axis';
 import { drag } from 'd3-drag';
 import { format } from 'd3-format';
@@ -517,12 +517,12 @@ class WildfireMapPane extends MapPane<DataManager<WildfireExtraInformation, Wild
         animator.on('change.set-handle-position', null);
         handle.classed('timeline-handle--grabbed', true);
       })
-      .on('drag', function() {
+      .on('drag', function(event) {
         const x = Math.max(time_axis_overview.range()[0], Math.min(event.x, time_axis_overview.range()[1]));
         handle.attr('transform', `translate(${x}, 0)`);
         updateDayFromDrag(x);
       })
-      .on('end', function() {
+      .on('end', function(event) {
         handle.classed('timeline-handle--grabbed', false);
         const x = Math.max(time_axis_overview.range()[0], Math.min(event.x, time_axis_overview.range()[1]));
         animator.on('change.set-handle-position', setHandleToPosition);
@@ -530,7 +530,7 @@ class WildfireMapPane extends MapPane<DataManager<WildfireExtraInformation, Wild
       });
 
     // set day to click position day
-    l.on('click', function() {
+    l.on('click', function(event) {
       const {clientX} = event;
       const {left} = l.node().getBoundingClientRect();
       const xpos = clientX - left;

@@ -1,5 +1,5 @@
 import { HierarchyNode, HierarchyRectangularNode, PartitionLayout, hierarchy, partition } from 'd3-hierarchy';
-import { Selection, select, event } from 'd3-selection';
+import { Selection, select } from 'd3-selection';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { bisector, range } from 'd3-array';
 
@@ -146,22 +146,22 @@ export default class Minimap<_Type> {
   }
 
   private _last_brushed: T.Datum<_Type>;
-  private onMouseMove(): void {
-    const datum = this.elementAtEventPosition();
+  private onMouseMove(event: MouseEvent): void {
+    const datum = this.elementAtEventPosition(event);
     if (datum !== this._last_brushed) {
       this._last_brushed = datum;
       this._hc.brush(datum || null);
     }
   }
 
-  private onMouseClick(): void {
-    const datum = this.elementAtEventPosition();
+  private onMouseClick(event: MouseEvent): void {
+    const datum = this.elementAtEventPosition(event);
     this._hc.focus(datum || null);
   }
 
-  private elementAtEventPosition(): T.Datum<_Type> | null {
+  private elementAtEventPosition(event: MouseEvent): T.Datum<_Type> | null {
     const {clientX, clientY, target} = event;
-    const {top,left} = target.getBoundingClientRect();
+    const {top,left} = (target as Element).getBoundingClientRect();
     const x = clientX - left;
     const y = clientY - top;
 
@@ -186,12 +186,12 @@ export default class Minimap<_Type> {
       .attr('y', this._y_scale.range()[0])
       .attr('width', this._x_scale_total.range()[1] - this._x_scale_total.range()[0])
       .attr('height', this._y_scale.range()[1] - this._y_scale.range()[0])
-      .on('mousemove', _ => this.onMouseMove())
+      .on('mousemove', event => this.onMouseMove(event))
       .on('mouseleave', _ => {
         this._last_brushed = null;
         this._hc.brush(null);
       })
-      .on('click', _ => this.onMouseClick());
+      .on('click', event => this.onMouseClick(event));
 
     const ref = this;
     select<HTMLSelectElement, any>('.controls .minimap-zoom-control select#zoom-type')

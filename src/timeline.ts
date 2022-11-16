@@ -2,7 +2,7 @@ import { BrushBehavior, brush, brushSelection } from 'd3-brush';
 import { Dispatch, dispatch } from 'd3-dispatch';
 import { ScaleTime, scaleSequential, scaleTime } from 'd3-scale';
 import { max, range, sum } from 'd3-array';
-import { Selection, event, select } from 'd3-selection';
+import { Selection, select } from 'd3-selection';
 import { TimeInterval } from 'd3-time';
 import { axisLeft } from 'd3-axis';
 import { interpolateGreys } from 'd3-scale-chromatic';
@@ -114,16 +114,16 @@ export default abstract class Timeline<
   private createBrush() {
     this._brush = brush<any>()
       .extent([[this._overview_extent[0], this._overview_size[0]], [this._overview_extent[1], this._overview_size[1]]])
-      .on('start', x => {
+      .on('start', (event, x) => {
         this._hc.brush(null);
         this._hc.createTooltip();
         if (event.sourceEvent?.type === "mousedown") this._is_dragging_brush = true;
       })
-      .on('brush', _ => {
-        this.updateTooltip();
+      .on('brush', event => {
+        this.updateTooltip(event);
       })
-      .on('end', _ => {
-        this.onBrushSelectionEnd();
+      .on('end', event => {
+        this.onBrushSelectionEnd(event);
         this._is_dragging_brush = false;
       });
 
@@ -137,30 +137,30 @@ export default abstract class Timeline<
       .classed('brush-area', true)
       .call(this._brush);
 
-    this._brush_g.on('wheel', _ => {
+    this._brush_g.on('wheel', event => {
       event.preventDefault();
       event.stopPropagation();
 
-      if (event.deltaY < 0) this.onBrushScrollUp();
+      if (event.deltaY < 0) this.onBrushScrollUp(event);
       else this.onBrushScrollDown();
     });
 
     this._brush_g
-      .on('mousemove.brush', _ => this.onBrushMouseMove())
-      .on('mousemove.tooltip', _ => this.checkShowTooltip())
+      .on('mousemove.brush', e => this.onBrushMouseMove(e))
+      .on('mousemove.tooltip', e => this.checkShowTooltip(e))
       .on('mouseleave.brush', _ => this._hc.brush(null))
-      .on('mouseleave.tooltip', _ => this.checkShowTooltip());
+      .on('mouseleave.tooltip', e => this.checkShowTooltip(e));
   }
 
   // tooltip management stuff
   private _is_dragging_brush: boolean = false;
 
-  private updateTooltip() {
+  private updateTooltip(event) {
     if (event.selection === null) {
       return;
     }
 
-    const evt = event.sourceEvent;
+    const evt = event;
     this._hc.showTooltip(true);
     this._hc.moveTooltip({x: evt.clientX, y: evt.clientY});
 
@@ -169,7 +169,7 @@ export default abstract class Timeline<
     this._hc.updateTimelineTooltip(elems);
   }
 
-  private checkShowTooltip() {
+  private checkShowTooltip(event: MouseEvent) {
     if (this._is_dragging_brush) return;
 
     const evt = event;
@@ -199,13 +199,13 @@ export default abstract class Timeline<
     return {x,y};
   }
 
-  private onBrushMouseMove(): void {
+  private onBrushMouseMove(event: MouseEvent): void {
     const {x} = this.relativeEventPosition(event);
     const elem = this._hc.elementAtOverviewX(x);
     this._hc.brush(elem);
   }
 
-  private onBrushScrollUp(): void {
+  private onBrushScrollUp(event: MouseEvent): void {
     this.resetBrush();
     const {x} = this.relativeEventPosition(event);
 
@@ -218,7 +218,7 @@ export default abstract class Timeline<
     this._hc.revert();
   }
 
-  private onBrushEmptyClick(): void {
+  private onBrushEmptyClick(event): void {
     // reset detail timeline
     this._time_axis_detail.domain(this._time_axis_overview.domain());
     this._dispatch.call('detail-timespan-change', null, this._time_axis_detail.domain());
@@ -239,9 +239,9 @@ export default abstract class Timeline<
     this._brush.on('end', onend);
   }
 
-  private onBrushSelectionEnd(): void {
+  private onBrushSelectionEnd(event): void {
     const sel = brushSelection(this._brush_g.node());
-    if (sel === null) this.onBrushEmptyClick();
+    if (sel === null) this.onBrushEmptyClick(event);
     else {
       const onend = this._brush.on('end');
       this._brush.on('end', null);

@@ -2,8 +2,7 @@ import { format } from 'd3-format';
 import { range } from 'd3-array';
 import {
   Selection,
-  select,
-  event
+  select
 } from 'd3-selection';
 
 import {Tooltip} from './tooltip';
@@ -89,9 +88,9 @@ export class Controls {
       .append('div')
       .classed('curve-type-selector', true)
       .classed('row', true)
-      .on('mousemove', ref.onCurveMove.bind(ref))
-      .on('mouseenter', (d) => ref.onCurveHoverStart(d))
-      .on('mouseleave', () => ref.onCurveHoverEnd())
+      .on('mousemove', e => ref.onCurveMove(e))
+      .on('mouseenter', (e, d) => ref.onCurveHoverStart(e, d))
+      .on('mouseleave', e => ref.onCurveHoverEnd(e))
       .each(function(d, i) {
         const input = select(this)
           .append('input')
@@ -154,26 +153,26 @@ export class Controls {
       .sort(ref._hc.compareProjections.bind(ref._hc));
   }
 
-  private onCurveHoverStart(curve: Projection) {
-    if (this._tooltip !== null) this.onCurveHoverEnd();
+  private onCurveHoverStart(e: Event, curve: Projection) {
+    if (this._tooltip !== null) this.onCurveHoverEnd(e);
 
     this._tooltip = new Tooltip();
-    this.onCurveMove();
+    this.onCurveMove(e);
     this._hc.focusProjection(curve.key);
 
     this._hc.createControlCurveComparison(this._tooltip, curve);
   }
 
-  private onCurveHoverEnd() {
+  private onCurveHoverEnd(e: Event) {
     this._tooltip.clear();
     this._tooltip = null;
     this._hc.focusProjection(null);
   }
 
-  private onCurveMove() {
+  private onCurveMove(event: Event) {
     if (this._tooltip !== null) this._tooltip.move({
-      x: event.clientX,
-      y: event.clientY
+      x: (event as MouseEvent).clientX,
+      y: (event as MouseEvent).clientY
     });
   }
 
