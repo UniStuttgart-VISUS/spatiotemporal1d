@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11234747.svg)](https://doi.org/10.5281/zenodo.11234747)
+
 # Visual Analysis of Spatio-temporal Phenomena with 1D Projections
 
 A live version of the prototype is available [here](http://566a2c3d-1608-4879-9865-345003f9aabf.ma.bw-cloud-instance.org)[^1].
