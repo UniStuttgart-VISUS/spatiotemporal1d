@@ -2,10 +2,7 @@
 
 # Visual Analysis of Spatio-temporal Phenomena with 1D Projections
 
-A live version of the prototype is available [here](http://566a2c3d-1608-4879-9865-345003f9aabf.ma.bw-cloud-instance.org)[^1].
-A dump of the static files can be found [here](https://zenodo.org/doi/10.5281/zenodo.11234746).
-
-[^1]: The live version will probably cease to exist as of July 2024.
+A dump of the static files of the prototype can be found [here](https://zenodo.org/doi/10.5281/zenodo.11234746).
 
 ## Building the Project
 ### JavaScript, CSS, HTML
